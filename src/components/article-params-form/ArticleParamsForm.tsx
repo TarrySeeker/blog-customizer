@@ -61,9 +61,7 @@ export const ArticleParamsForm = (props: ArticleParamsFormProps) => {
 				isActive={isOpened}
 				onClick={() => setIsOpened((currentIsOpened) => !currentIsOpened)}
 			/>
-			<div
-				onClick={() => setIsOpened(false)}
-				className={clsx(styles.overlay, isOpened && styles.overlay_open)}></div>
+			<div className={clsx(styles.overlay, isOpened && styles.overlay_open)}></div>
 			<aside
 				className={clsx(styles.container, isOpened && styles.container_open)}>
 				<form
