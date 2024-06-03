@@ -3,6 +3,7 @@ import { Button } from 'components/button';
 import { Text } from '../text';
 
 import clsx from 'clsx';
+import { useEffect, useRef, useState, FormEvent } from 'react';
 
 import styles from './ArticleParamsForm.module.scss';
 import { Select } from '../select';
@@ -18,7 +19,6 @@ import {
 } from 'src/constants/articleProps';
 import { RadioGroup } from '../radio-group';
 import { Separator } from '../separator';
-import { useState, FormEvent } from 'react';
 
 export type ArticleParamsFormProps = {
 	setAppState: (value: ArticleStateType) => void;
@@ -28,6 +28,7 @@ export const ArticleParamsForm = (props: ArticleParamsFormProps) => {
 	const { setAppState } = props;
 
 	const [isOpened, setIsOpened] = useState<boolean>(false);
+	const sidebarRef = useRef<HTMLDivElement>(null);
 
 	const [formState, setFormState] =
 		useState<ArticleStateType>(defaultArticleState);
@@ -43,17 +44,35 @@ export const ArticleParamsForm = (props: ArticleParamsFormProps) => {
 
 	const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
-
 		setAppState(formState);
 	};
 
 	const handleReset = (event: FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
-
 		setFormState(defaultArticleState);
-
 		setAppState(defaultArticleState);
 	};
+
+	useEffect(() => {
+		const handleClickOutside = (event: MouseEvent) => {
+			if (
+				sidebarRef.current &&
+				!sidebarRef.current.contains(event.target as Node)
+			) {
+				setIsOpened(false);
+			}
+		};
+
+		if (isOpened) {
+			document.addEventListener('mousedown', handleClickOutside);
+		} else {
+			document.removeEventListener('mousedown', handleClickOutside);
+		}
+
+		return () => {
+			document.removeEventListener('mousedown', handleClickOutside);
+		};
+	}, [isOpened]);
 
 	return (
 		<>
@@ -61,9 +80,9 @@ export const ArticleParamsForm = (props: ArticleParamsFormProps) => {
 				isActive={isOpened}
 				onClick={() => setIsOpened((currentIsOpened) => !currentIsOpened)}
 			/>
-			<div className={clsx(styles.overlay, isOpened && styles.overlay_open)}></div>
 			<aside
-				className={clsx(styles.container, isOpened && styles.container_open)}>
+				className={clsx(styles.container, isOpened && styles.container_open)}
+				ref={sidebarRef}>
 				<form
 					onSubmit={handleSubmit}
 					onReset={handleReset}
